@@ -1,0 +1,6 @@
+@CCL.API_HostAddress = http://localhost:5295
+
+GET {{CCL.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
