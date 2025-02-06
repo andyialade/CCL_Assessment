@@ -24,8 +24,10 @@ public class UserDocumentRepository(IConfiguration configuration) : IUserDocumen
             Converters = { new DateTimeConverter() }
         };
 
+        string basePath = AppDomain.CurrentDomain.BaseDirectory;
+        var filename = Path.Combine(basePath, dbFilePath);
 
-        using (var stream = new FileStream(dbFilePath, FileMode.Open, FileAccess.Read))
+        using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
         {
             var jsonData = await JsonSerializer.DeserializeAsync<IEnumerable<UserDocument>>(stream, options);
             if (jsonData == null || !jsonData.Any())

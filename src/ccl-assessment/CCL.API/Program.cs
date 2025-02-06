@@ -29,8 +29,6 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddApplicationServices();
-
 builder.Services
        .AddApplicationServices()
        .AddInfrastructureServices();
