@@ -1,0 +1,13 @@
+services:
+  cclapi:
+    image: ${DOCKER_REGISTRY-}cclapi
+    build:
+      context: .
+      dockerfile: CCL.API/Dockerfile
+
+  cclui:
+    image: ${DOCKER_REGISTRY-}cclui
+    build:
+      context: .
+      dockerfile: CCL.UI/Dockerfile
+

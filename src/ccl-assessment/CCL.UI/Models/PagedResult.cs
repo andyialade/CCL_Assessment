@@ -7,4 +7,5 @@ public class PagedResult<T>
     public int TotalItemsCount { get; set; }
     public int ItemsFrom { get; set; }
     public int ItemsTo { get; set; }
+    public int PageNumber { get; set; }
 }

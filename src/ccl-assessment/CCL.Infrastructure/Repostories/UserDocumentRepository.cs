@@ -82,6 +82,9 @@ public class UserDocumentRepository(IConfiguration configuration) : IUserDocumen
         string dbFilePath = configuration.GetSection("Database").GetSection("JsonData").Value ?? string.Empty;
         if (string.IsNullOrEmpty(dbFilePath)) throw new InternalServerErrorException("Unable to locate database. Please contact administrator");
 
+        string basePath = AppDomain.CurrentDomain.BaseDirectory;
+        var filename = Path.Combine(basePath, dbFilePath);
+
         JsonSerializerOptions options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
@@ -89,7 +92,7 @@ public class UserDocumentRepository(IConfiguration configuration) : IUserDocumen
             Converters = { new DateTimeConverter() }
         };
 
-        using (var stream = new FileStream(dbFilePath, FileMode.Open, FileAccess.Read))
+        using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
         {
             var jsonData = await JsonSerializer.DeserializeAsync<IEnumerable<UserDocument>>(stream, options);
             if (jsonData == null || !jsonData.Any())

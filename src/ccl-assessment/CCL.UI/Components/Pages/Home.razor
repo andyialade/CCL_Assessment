@@ -1,7 +1,112 @@
 ﻿@page "/"
+@using CCL.UI.Models
+@using CCL.UI.Services
+@inject UserDocumentService documentService
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>User Documents</h1>
 
-Welcome to your new app.
+@if (allDocuments == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <button class="btn btn-primary" @onclick="ToggleIdVisibility">Toggle Id Visibility</button>
+    <button class="btn btn-primary" @onclick="RefreshData">Refresh</button>
+
+    <table class="table table-striped">
+        <thead class="table-light">
+            <tr>
+                @if (isVisible){
+                    <th>#</th>
+                }      
+                <th>FileName</th>
+                <th>FullPath</th>
+                <th>IsEncrypted</th>
+                <th>Created</th>
+                <th>Modified</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var doc in allDocuments)
+            {
+                <tr>
+                    @if (isVisible)
+                    {
+                        <td>@doc.Index</td>
+                    }
+                    <td>@doc.FileName</td>
+                    <td>@doc.FullPath</td>
+                    <td>@doc.IsEncrypted</td>
+                    <td>@doc.Created.ToString("dd-MM-yyyy HH:mm:ss")</td>
+                    <td>@doc.Modified.ToString("dd-MM-yyyy HH:mm:ss")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")"><a class="page-link" href="#" @onclick="PreviousPage">Previous</a></li>
+@*             @for (int pg = 1; pg <= totalPages; pg++)
+            {
+                <li class="page-item @(currentPage == pg ? "active" : "") @(currentPage == pg ? "disabled" : "")"><a class="page-link" href="#" @onclick="() => GoToPage(pg)">@pg</a></li>
+            } *@
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")"><a class="page-link" href="#" @onclick="NextPage">Next</a></li>
+        </ul>
+    </nav>
+}
+
+
+@code {
+    private List<UserDocument> allDocuments;
+    private int pageSize = 20;
+    private int currentPage = 1;
+    private bool isVisible = true;
+    private int totalPages;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task PreviousPage()
+    {
+        currentPage--;
+        await LoadData();
+    }
+
+    private async Task NextPage()
+    {
+        currentPage++;
+        await LoadData();
+    }
+
+    private async Task GoToPage(int page)
+    {
+        currentPage = page;
+        await LoadData();
+    }
+
+    private async Task RefreshData()
+    {
+        currentPage = 1;
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        var pagedResult = await documentService.GetAllUserDocumentsAsync(currentPage, pageSize);
+        allDocuments = pagedResult != null && pagedResult.Items.Any() ? pagedResult.Items.ToList() : new List<UserDocument>();
+        totalPages = pagedResult != null ? pagedResult.TotalPages : totalPages;
+        currentPage = pagedResult != null ? pagedResult.PageNumber : currentPage;
+    }
+
+    private void ToggleIdVisibility()
+    {
+        isVisible = !isVisible;
+    }
+}

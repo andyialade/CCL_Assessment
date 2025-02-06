@@ -2,15 +2,20 @@ using CCL.UI.Components;
 using CCL.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var handler = new HttpClientHandler
+{
+    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+};
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
 builder.Services.AddHttpClient<UserDocumentService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7051");
-});
+    client.BaseAddress = new Uri("https://cclapi:8081/");
+}).ConfigurePrimaryHttpMessageHandler(() => handler);
 
 var app = builder.Build();
 
